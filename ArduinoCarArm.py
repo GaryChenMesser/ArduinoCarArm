@@ -5,13 +5,8 @@ import serial
 import serial.tools.list_ports
 from pynput import keyboard
 
-_base_deg = 100
-_shoulder_deg = 100
-_elbow_deg = 100
-_gripper_deg = 100
-
+### global constants ###
 move_step = 5
-
 switcher = {
         #Car
         'MOT_A_SPD':   'a',
@@ -30,8 +25,14 @@ switcher = {
         'GRIPPER_OC':  'o'
 }
 
+### global variables ###
+_base_deg = 100
+_shoulder_deg = 100
+_elbow_deg = 100
+_gripper_deg = 100
+
+### method ###
 def cmd_handler(arg1, arg2=None):
-    global switcher
     ser.write(switcher[arg1].encode())
     if arg2:
         ser.write(str(arg2).encode())
@@ -71,9 +72,7 @@ def cleanup():
     print("Cleanup!")
 
 def on_press(key):
-    global _base_deg
-    global _shoulder_deg
-    global _elbow_deg
+    global _base_deg, _shoulder_deg, _elbow_deg
 
     if key == keyboard.Key.up:
         cmd_handler('FORWARD_CMD')
@@ -120,9 +119,8 @@ def on_release(key):
         cmd_handler('STOP_CMD')
     elif key == keyboard.Key.right:
         cmd_handler('STOP_CMD')
-    if key == keyboard.Key.esc:
-        # Stop listener
-        return False
+    elif key == keyboard.Key.esc:
+        return False # Stop listener
 
 #atexit.register(cleanup)
 
@@ -134,9 +132,6 @@ def main():
 
     port = input("Port(tty***/COM***):")
     baud = input("Baudrate:")
-    #port = "/dev/"+port
-    print (type(baud))
-    #print("Port:"+port+",Baud:"+baud)
 
     try:
         ser = serial.Serial(port, baud, timeout=3)
