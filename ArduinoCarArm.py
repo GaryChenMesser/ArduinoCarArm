@@ -74,7 +74,7 @@ def cleanup():
 
 def on_press(key):
     global _base_deg, _shoulder_deg, _elbow_deg
-
+    
     if key == keyboard.Key.up:
         cmd_handler('FORWARD_CMD')
         print('Forward')
@@ -87,28 +87,28 @@ def on_press(key):
     elif key == keyboard.Key.right:
         cmd_handler('RIGHT_CMD')
         print('Turn right')
-    elif key == ".":
+    elif str(key)[1] == '.':
         cmd_handler('STOP_CMD')
         print("STOP")
-    elif key == "a":
+    elif str(key)[1] == 'a':
         _base_deg -= move_step
         cmd_handler('BASE_CMD', _base_deg)
-    elif key == "d":
+    elif str(key)[1] == 'd':
         _base_deg += move_step
         cmd_handler('BASE_CMD', _base_deg)
-    elif key == "w":
+    elif str(key)[1] == 'w':
         _shoulder_deg += move_step
         cmd_handler('SHOULDER_CMD', _shoulder_deg)
-    elif key == "s":
+    elif str(key)[1] == 's':
         _shoulder_deg -= move_step
         cmd_handler('SHOULDER_CMD', _shoulder_deg)
-    elif key == "q":
+    elif str(key)[1] == 'q':
         _elbow_deg -= move_step
         cmd_handler('ELBOW_CMD', _elbow_deg)
-    elif key == "e":
+    elif str(key)[1] == 'e':
         _elbow_deg += move_step
         cmd_handler('ELBOW_CMD', _elbow_deg)
-    elif key == "o":
+    elif str(key)[1] == 'o':
         cmd_handler('GRIPPER_OC')
 
 def on_release(key):
