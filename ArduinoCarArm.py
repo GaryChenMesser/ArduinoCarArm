@@ -12,8 +12,7 @@ _gripper_deg = 100
 
 move_step = 5
 
-def cmd_handler(arg):
-    switcher = {
+switcher = {
         #Car
         'MOT_A_SPD':   'a',
         'MOT_B_SPD':   'c',
@@ -29,10 +28,15 @@ def cmd_handler(arg):
         'ELBOW_CMD':   'e',
         'GRIPPER_CMD': 'g',
         'GRIPPER_OC':  'o'
-    }
-    ser.write(switcher.get(arg).encode())
-    #return switcher.get(arg, "\n")
+}
 
+def cmd_handler(arg1, arg2=None):
+    global switcher
+    ser.write(switcher[arg1].encode())
+    if arg2:
+        ser.write(str(arg2).encode())
+    ser.write('\n'.encode())
+	
 #Courtesy by Thomas @ https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
 def get_serial_ports():
     """ Lists serial port names
@@ -88,32 +92,24 @@ def on_press(key):
         print("STOP")
     elif key == "a":
         _base_deg -= move_step
-        cmd_handler('BASE_CMD')
-        ser.write(str(_base_deg).encode())
+        cmd_handler('BASE_CMD', _base_deg)
     elif key == "d":
         _base_deg += move_step
-        cmd_handler('BASE_CMD')
-        ser.write(str(_base_deg).encode())
+        cmd_handler('BASE_CMD', _base_deg)
     elif key == "w":
         _shoulder_deg += move_step
-        cmd_handler('SHOULDER_CMD')
-        ser.write(str(_shoulder_deg).encode())
+        cmd_handler('SHOULDER_CMD', _shoulder_deg)
     elif key == "s":
         _shoulder_deg -= move_step
-        cmd_handler('SHOULDER_CMD')
-        ser.write(str(_shoulder_deg).encode())
+        cmd_handler('SHOULDER_CMD', _shoulder_deg)
     elif key == "q":
         _elbow_deg -= move_step
-        cmd_handler('ELBOW_CMD')
-        ser.write(str(_elbow_deg).encode())
+        cmd_handler('ELBOW_CMD', _elbow_deg)
     elif key == "e":
         _elbow_deg += move_step
-        cmd_handler('ELBOW_CMD')
-        ser.write(str(_elbow_deg).encode())
+        cmd_handler('ELBOW_CMD', _elbow_deg)
     elif key == "o":
         cmd_handler('GRIPPER_OC')
-    ser.write('\n'.encode())
-
 
 def on_release(key):
     if key == keyboard.Key.up:
@@ -124,7 +120,9 @@ def on_release(key):
         cmd_handler('STOP_CMD')
     elif key == keyboard.Key.right:
         cmd_handler('STOP_CMD')
-    ser.write('\n'.encode())
+    if key == keyboard.Key.esc:
+        # Stop listener
+        return False
 
 #atexit.register(cleanup)
 
@@ -132,31 +130,22 @@ def on_release(key):
 #Main program start here
 #
 def main():
-	print("Available serial ports:")
+    print("Available serial ports:{}".format(get_serial_ports()))
 
-	get_serial_ports()
+    port = input("Port(tty***/COM***):")
+    baud = input("Baudrate:")
+    #port = "/dev/"+port
+    print (type(baud))
+    #print("Port:"+port+",Baud:"+baud)
 
-	port = input("Port(tty***/COM***):")
-	baud = input("Baudrate:")
-	#port = "/dev/"+port
-	print (type(baud))
-	#print("Port:"+port+",Baud:"+baud)
+    try:
+        ser = serial.Serial(port, baud, timeout=3)
+    except serial.SerialException:
+        print("Connect error")
+        sys.exit(0)
 
-	try:
-		ser = serial.Serial(port, baud, timeout=3)
-	except serial.SerialException:
-		print("Connect error")
-		sys.exit(0)
-
-	try:
-		while True:
-			with keyboard.Listener(on_press = on_press, on_release = on_release) as listener:
-				listener.join()
-			#TODO:Print serial Rx message
-			#if 
-			#print(ser.readline())
-	except KeyboardInterrupt:
-		pass
+    with keyboard.Listener(on_press = on_press, on_release = on_release) as listener:
+        listener.join()
 
 if __name__ == '__main__':
-	main()
+    main()
