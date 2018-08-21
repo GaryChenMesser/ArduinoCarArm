@@ -30,6 +30,7 @@ _base_deg = 100
 _shoulder_deg = 100
 _elbow_deg = 100
 _gripper_deg = 100
+ser = None
 
 ### method ###
 def cmd_handler(arg1, arg2=None):
@@ -128,6 +129,7 @@ def on_release(key):
 #Main program start here
 #
 def main():
+    global ser
     print("Available serial ports:{}".format(get_serial_ports()))
 
     port = input("Port(tty***/COM***):")
